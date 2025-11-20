@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reply Template Creation App</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header>
+        <p class="eyebrow">Reply Template Creation App</p>
+        <h1>X（Twitter）リプライテンプレートメーカー</h1>
+        <p class="lede">
+          リプライ／引用リポストの組み合わせと下書きを入力するだけで、ChatGPT に貼り付けるプロンプトとコピペ用テキストをまとめて生成します。
+        </p>
+      </header>
+
+      <section class="panel">
+        <h2>入力フォーム</h2>
+        <form id="templateForm" novalidate>
+          <div class="field-group">
+            <span class="field-label">相手からの反応</span>
+            <div class="radio-pair">
+              <label>
+                <input type="radio" name="reactionType" value="reply" />
+                リプライ
+              </label>
+              <label>
+                <input type="radio" name="reactionType" value="quote" />
+                引用リポスト
+              </label>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <span class="field-label">これから投稿する形式</span>
+            <div class="radio-pair">
+              <label>
+                <input type="radio" name="replyType" value="reply" />
+                リプライ
+              </label>
+              <label>
+                <input type="radio" name="replyType" value="quote" />
+                引用リポスト
+              </label>
+            </div>
+          </div>
+
+          <label class="field-group" for="selfPost">
+            <span class="field-label">自分のポスト内容</span>
+            <textarea id="selfPost" name="selfPost" rows="4" placeholder="自分が投稿した内容を貼り付けてください"></textarea>
+          </label>
+
+          <label class="field-group" for="reactionPost">
+            <span class="field-label">相手の反応内容</span>
+            <textarea id="reactionPost" name="reactionPost" rows="4" placeholder="相手のリプライ／引用リポストを貼り付けてください"></textarea>
+          </label>
+
+          <label class="field-group optional" for="replyDraft">
+            <span class="field-label">これから投稿したい文章（任意）</span>
+            <textarea id="replyDraft" name="replyDraft" rows="6" placeholder="思いつく文章や含めたいポイントがあればメモしてください"></textarea>
+          </label>
+
+          <label class="field-group optional" for="additionalNote">
+            <span class="field-label">補足情報（任意）</span>
+            <textarea id="additionalNote" name="additionalNote" rows="3" placeholder="語調の希望や避けたい表現など、ChatGPTに伝えたいことがあれば入力"></textarea>
+          </label>
+
+          <div class="form-actions">
+            <button type="submit" class="primary">テンプレートを生成</button>
+            <button type="reset" class="ghost">リセット</button>
+          </div>
+          <p class="form-message" id="formMessage" role="alert" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="panel output-panel" id="outputPanel" aria-live="polite">
+        <h2>生成結果</h2>
+
+        <article class="output-card">
+          <header>
+            <div>
+              <p class="eyebrow">ChatGPT に貼る説明</p>
+              <h3>シナリオプロンプト</h3>
+            </div>
+            <button type="button" class="copy" data-target="promptOutput">コピー</button>
+          </header>
+          <textarea id="promptOutput" readonly></textarea>
+          <p class="copy-feedback" data-for="promptOutput"></p>
+        </article>
+
+      </section>
+    </main>
+    <script src="app.js" defer></script>
+  </body>
+</html>
