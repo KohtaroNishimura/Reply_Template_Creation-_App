@@ -74,11 +74,6 @@ header h1 {
   font-weight: 600;
 }
 
-.field-note {
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-
 .field-group.optional .field-label::after {
   content: "（任意）";
   font-weight: 400;

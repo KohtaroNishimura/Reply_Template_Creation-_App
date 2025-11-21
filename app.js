@@ -53,6 +53,9 @@ function collectFormData() {
   if (!formValues.reactionType) missingFields.push("相手の反応");
   if (!formValues.replyType) missingFields.push("これから投稿する形式");
   if (!formValues.selfPost) missingFields.push("自分のポスト内容");
+  if (!formValues.reactionPost && formValues.reactionType !== "selfQuote") {
+    missingFields.push("相手の反応／引用したいポスト");
+  }
 
   if (missingFields.length > 0) {
     return {
@@ -94,9 +97,10 @@ function buildPrompt(values) {
     values.selfPost,
   ];
 
-  if (values.reactionType) {
-    const reactionBody = values.reactionPost || getReactionFallback(values.reactionType);
-    promptParts.push("", reactionSectionLabel, reactionBody);
+  if (values.reactionPost && values.reactionType === "selfQuote") {
+    promptParts.push("", reactionSectionLabel, values.reactionPost);
+  } else if (values.reactionType !== "selfQuote") {
+    promptParts.push("", reactionSectionLabel, values.reactionPost);
   }
 
   promptParts.push(
@@ -106,13 +110,6 @@ function buildPrompt(values) {
   );
 
   return promptParts.filter(Boolean).join("\n");
-}
-
-function getReactionFallback(reactionType) {
-  if (reactionType === "selfQuote") {
-    return "（引用したい自分のポストは貼り付けられていません。必要に応じて参照するポストを別途指定してください。）";
-  }
-  return "（相手の反応本文は入力されていません。上記の状況と補足から内容を補完してください。）";
 }
 
 const copyButtons = document.querySelectorAll("button.copy");
