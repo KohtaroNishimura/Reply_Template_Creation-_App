@@ -30,6 +30,10 @@
                 <input type="radio" name="reactionType" value="quote" />
                 引用リポスト
               </label>
+              <label>
+                <input type="radio" name="reactionType" value="selfQuote" />
+                相手はいない（自分のポストを引用する）
+              </label>
             </div>
           </div>
 
@@ -53,8 +57,13 @@
           </label>
 
           <label class="field-group" for="reactionPost">
-            <span class="field-label">相手の反応内容</span>
-            <textarea id="reactionPost" name="reactionPost" rows="4" placeholder="相手のリプライ／引用リポストを貼り付けてください"></textarea>
+            <span class="field-label">相手の反応内容／引用したいポスト</span>
+            <textarea
+              id="reactionPost"
+              name="reactionPost"
+              rows="4"
+              placeholder="相手のリプライ／引用リポスト、または自分のポストを引用する場合は引用対象を貼り付けてください"
+            ></textarea>
           </label>
 
           <label class="field-group optional" for="replyDraft">
