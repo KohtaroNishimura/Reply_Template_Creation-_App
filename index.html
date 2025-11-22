@@ -34,6 +34,10 @@
                 <input type="radio" name="reactionType" value="selfQuote" />
                 相手はいない（自分のポストを引用する）
               </label>
+              <label>
+                <input type="radio" name="reactionType" value="freshQuote" />
+                誰かのポストを引用リポストしたい（相手からの反応はない）
+              </label>
             </div>
           </div>
 
@@ -53,6 +57,7 @@
 
           <label class="field-group" for="selfPost">
             <span class="field-label">自分のポスト内容</span>
+            <span class="field-note">まだ自分の投稿がない状態で引用リポストする場合は空欄でも構いません</span>
             <textarea id="selfPost" name="selfPost" rows="4" placeholder="自分が投稿した内容を貼り付けてください"></textarea>
           </label>
 

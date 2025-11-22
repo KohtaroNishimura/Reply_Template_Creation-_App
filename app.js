@@ -2,12 +2,14 @@ const postTypeLabels = {
   reply: "リプライ",
   quote: "引用リポスト",
   selfQuote: "自分のポストを引用（相手なし）",
+  freshQuote: "誰かのポストを引用（相手からの反応なし）",
 };
 
 const reactionDescriptions = {
   reply: "相手があなたの投稿にリプライしています。",
   quote: "相手があなたの投稿を引用リポストしています。",
   selfQuote: "他者からの反応はなく、あなたが自分のポストを引用リポストしようとしています。",
+  freshQuote: "他者のポストを引用リポストしようとしており、まだ自分への反応はありません。",
 };
 
 const form = document.getElementById("templateForm");
@@ -52,7 +54,9 @@ function collectFormData() {
 
   if (!formValues.reactionType) missingFields.push("相手の反応");
   if (!formValues.replyType) missingFields.push("これから投稿する形式");
-  if (!formValues.selfPost) missingFields.push("自分のポスト内容");
+  if (!formValues.selfPost && requiresSelfPost(formValues.reactionType)) {
+    missingFields.push("自分のポスト内容");
+  }
 
   if (missingFields.length > 0) {
     return {
@@ -69,6 +73,11 @@ function getCheckedValue(name) {
   return checked ? checked.value : "";
 }
 
+function requiresSelfPost(reactionType) {
+  if (!reactionType) return true;
+  return reactionType !== "freshQuote";
+}
+
 function showFormMessage(message, hasError) {
   formMessage.textContent = message;
   formMessage.style.color = hasError ? "var(--danger)" : "var(--success)";
@@ -79,8 +88,15 @@ function buildPrompt(values) {
   const draftSection = values.replyDraft
     ? values.replyDraft
     : "（具体的な下書きはありません。上記の状況を踏まえて自然な返信案を作成してください。）";
-  const reactionSummaryLabel = values.reactionType === "selfQuote" ? "投稿状況" : "相手からの反応";
-  const reactionSectionLabel = values.reactionType === "selfQuote" ? "[引用したい自分のポスト]" : "[相手の反応]";
+  const isSelfQuote = values.reactionType === "selfQuote";
+  const isFreshQuote = values.reactionType === "freshQuote";
+  const reactionSummaryLabel = isSelfQuote || isFreshQuote ? "投稿状況" : "相手からの反応";
+  const reactionSectionLabel = isSelfQuote
+    ? "[引用したい自分のポスト]"
+    : isFreshQuote
+    ? "[引用したい相手のポスト]"
+    : "[相手の反応]";
+  const selfPostSection = values.selfPost || getSelfPostFallback(values.reactionType);
 
   const promptParts = [
     "# シナリオ",
@@ -90,9 +106,11 @@ function buildPrompt(values) {
     values.additionalNote ? `- 補足要望: ${values.additionalNote}` : "",
     "",
     "# 会話ログ",
-    "[自分のポスト]",
-    values.selfPost,
   ];
+
+  if (selfPostSection) {
+    promptParts.push("", "[自分のポスト]", selfPostSection);
+  }
 
   if (values.reactionType) {
     const reactionBody = values.reactionPost || getReactionFallback(values.reactionType);
@@ -112,7 +130,17 @@ function getReactionFallback(reactionType) {
   if (reactionType === "selfQuote") {
     return "（引用したい自分のポストは貼り付けられていません。必要に応じて参照するポストを別途指定してください。）";
   }
+  if (reactionType === "freshQuote") {
+    return "（引用したい相手のポスト本文は入力されていません。対象となるポストを貼り付けるか、引用したい要点を補足してください。）";
+  }
   return "（相手の反応本文は入力されていません。上記の状況と補足から内容を補完してください。）";
+}
+
+function getSelfPostFallback(reactionType) {
+  if (reactionType === "freshQuote") {
+    return "（まだ自分のポストはありません。以下の引用対象と補足情報をもとに、引用リポスト用の文章を作成してください。）";
+  }
+  return "";
 }
 
 const copyButtons = document.querySelectorAll("button.copy");
