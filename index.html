@@ -20,7 +20,7 @@
         <h2>入力フォーム</h2>
         <form id="templateForm" novalidate>
           <div class="field-group">
-            <span class="field-label">相手からの反応</span>
+            <span class="field-label">投稿のきっかけ</span>
             <div class="radio-pair">
               <label>
                 <input type="radio" name="reactionType" value="reply" />
@@ -37,6 +37,10 @@
               <label>
                 <input type="radio" name="reactionType" value="freshQuote" />
                 誰かのポストを引用リポストしたい（相手からの反応はない）
+              </label>
+              <label>
+                <input type="radio" name="reactionType" value="freshReply" />
+                誰かのポストにリプライしたい（相手からの反応はない）
               </label>
             </div>
           </div>
@@ -57,12 +61,12 @@
 
           <label class="field-group" for="selfPost">
             <span class="field-label">自分のポスト内容</span>
-            <span class="field-note">まだ自分の投稿がない状態で引用リポストする場合は空欄でも構いません</span>
+            <span class="field-note">誰かのポストへ新たにリプライ／引用リポストする場合は空欄でも構いません</span>
             <textarea id="selfPost" name="selfPost" rows="4" placeholder="自分が投稿した内容を貼り付けてください"></textarea>
           </label>
 
           <label class="field-group" for="reactionPost">
-            <span class="field-label">相手の反応内容／引用したいポスト</span>
+            <span class="field-label">相手の反応内容／返信・引用したいポスト</span>
             <span class="field-note">自分のポストを引用する場合は空欄のままでもテンプレートを生成できます</span>
             <textarea
               id="reactionPost"

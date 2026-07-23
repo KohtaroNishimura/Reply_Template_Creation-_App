@@ -3,6 +3,7 @@ const postTypeLabels = {
   quote: "引用リポスト",
   selfQuote: "自分のポストを引用（相手なし）",
   freshQuote: "誰かのポストを引用（相手からの反応なし）",
+  freshReply: "誰かのポストにリプライ（相手からの反応なし）",
 };
 
 const reactionDescriptions = {
@@ -10,6 +11,7 @@ const reactionDescriptions = {
   quote: "相手があなたの投稿を引用リポストしています。",
   selfQuote: "他者からの反応はなく、あなたが自分のポストを引用リポストしようとしています。",
   freshQuote: "他者のポストを引用リポストしようとしており、まだ自分への反応はありません。",
+  freshReply: "他者のポストにリプライしようとしており、まだ自分への反応はありません。",
 };
 
 const form = document.getElementById("templateForm");
@@ -75,7 +77,7 @@ function getCheckedValue(name) {
 
 function requiresSelfPost(reactionType) {
   if (!reactionType) return true;
-  return reactionType !== "freshQuote";
+  return reactionType !== "freshQuote" && reactionType !== "freshReply";
 }
 
 function showFormMessage(message, hasError) {
@@ -87,16 +89,19 @@ function buildPrompt(values) {
   const scenario = reactionDescriptions[values.reactionType] || "X上のやり取りを要約してください。";
   const draftSection = values.replyDraft
     ? values.replyDraft
-    : "（具体的な下書きはありません。上記の状況を踏まえて自然な返信案を作成してください。）";
+    : "（具体的な下書きはありません。上記の状況を踏まえて自然な投稿案を作成してください。）";
   const isSelfQuote = values.reactionType === "selfQuote";
   const isFreshQuote = values.reactionType === "freshQuote";
-  const reactionSummaryLabel = isSelfQuote || isFreshQuote ? "投稿状況" : "相手からの反応";
+  const isFreshReply = values.reactionType === "freshReply";
+  const reactionSummaryLabel = isSelfQuote || isFreshQuote || isFreshReply ? "投稿状況" : "相手からの反応";
   const reactionSectionLabel = isSelfQuote
     ? "[引用したい自分のポスト]"
     : isFreshQuote
     ? "[引用したい相手のポスト]"
+    : isFreshReply
+    ? "[リプライしたい相手のポスト]"
     : "[相手の反応]";
-  const selfPostSection = values.selfPost || getSelfPostFallback(values.reactionType);
+  const selfPostSection = values.selfPost;
 
   const promptParts = [
     "# シナリオ",
@@ -133,14 +138,10 @@ function getReactionFallback(reactionType) {
   if (reactionType === "freshQuote") {
     return "（引用したい相手のポスト本文は入力されていません。対象となるポストを貼り付けるか、引用したい要点を補足してください。）";
   }
-  return "（相手の反応本文は入力されていません。上記の状況と補足から内容を補完してください。）";
-}
-
-function getSelfPostFallback(reactionType) {
-  if (reactionType === "freshQuote") {
-    return "（まだ自分のポストはありません。以下の引用対象と補足情報をもとに、引用リポスト用の文章を作成してください。）";
+  if (reactionType === "freshReply") {
+    return "（リプライしたい相手のポスト本文は入力されていません。対象となるポストを貼り付けるか、返信したい要点を補足してください。）";
   }
-  return "";
+  return "（相手の反応本文は入力されていません。上記の状況と補足から内容を補完してください。）";
 }
 
 const copyButtons = document.querySelectorAll("button.copy");
